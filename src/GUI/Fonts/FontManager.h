@@ -46,12 +46,6 @@ namespace FontManager
 	void ADDONAPI_Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Get2:
-	/// 	Addon API wrapper to get a font sent to the callback.
-	///----------------------------------------------------------------------------------------------------
-	ImFont* ADDONAPI_Get2(const char* aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_Release:
 	/// 	Addon API wrapper to release a receiver/callback from a specific font.
 	///----------------------------------------------------------------------------------------------------

@@ -29,17 +29,8 @@ namespace FontManager
 		CFontManager& inst = CFontManager::GetInstance();
 		ManagedFont* font = inst.Get(aIdentifier);
 
+		font->Subscribers.push_back(aCallback);
 		aCallback(aIdentifier, font->Pointer);
-	}
-
-	ImFont* ADDONAPI_Get2(const char* aIdentifier)
-	{
-		if (!aIdentifier) { return nullptr; }
-
-		CFontManager& inst = CFontManager::GetInstance();
-		ManagedFont* font = inst.Get(aIdentifier);
-
-		return font->Pointer;
 	}
 
 	void ADDONAPI_Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
