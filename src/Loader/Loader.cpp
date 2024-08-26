@@ -207,6 +207,11 @@ namespace Loader
 
 					if (!addon)
 					{
+						addon = FindAddonByMatchSig(signature);
+					}
+
+					if (!addon)
+					{
 						addon = new Addon{};
 						addon->State = EAddonState::None;
 						Addons.push_back(addon);
