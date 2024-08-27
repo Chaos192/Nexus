@@ -176,16 +176,23 @@ public:
 	int Verify(void* aStartAddress, void* aEndAddress);
 
 private:
-	mutable std::mutex				Mutex;
-	std::map<std::string, Texture*>	Registry;
-	std::vector<QueuedTexture>		QueuedTextures;
+	mutable std::mutex                           Mutex;
+	std::map<std::string, Texture*>              Registry;
+	std::vector<QueuedTexture>                   QueuedTextures;
+	
+	struct StagedTextureCallback
+	{
+		TEXTURES_RECEIVECALLBACK Callback;
+		bool                     IsValid;
+	};
+	std::map<std::string, StagedTextureCallback> PendingCallbacks; /* set to false if no longer valid */
 
 	///----------------------------------------------------------------------------------------------------
 	/// OverrideTexture:
 	/// 	Internal function to override texture load with custom user texture on disk.
 	///----------------------------------------------------------------------------------------------------
 	bool OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback);
-
+	
 	///----------------------------------------------------------------------------------------------------
 	/// QueueTexture:
 	/// 	Pushes a texture into the queue to load during the next frame.

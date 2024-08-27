@@ -1188,6 +1188,12 @@
     <None Include="src\Resources\Locales\pl_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
+    <None Include="src\Resources\Locales\fr_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
+    <None Include="src\Resources\Locales\cn_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Font Include="src\Resources\Fonts\Menomonia.ttf">
