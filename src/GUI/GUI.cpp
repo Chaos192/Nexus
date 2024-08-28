@@ -165,18 +165,22 @@ namespace GUI
 			{
 				// mouse input
 				case WM_MOUSEMOVE:
-					io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
-
-					if (IsLeftClickHeld || IsRightClickHeld)
+				{
+					CURSORINFO curInfo{};
+					curInfo.cbSize = sizeof(CURSORINFO);
+					GetCursorInfo(&curInfo);
+					if (curInfo.flags & CURSOR_SHOWING)
 					{
-						io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
+						/* only set cursor pos if cursor is visible */
+						io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
 					}
-					else if (io.WantCaptureMouse)
+
+					if (io.WantCaptureMouse)
 					{
 						return 0;
 					}
 					break;
-
+				}
 				case WM_LBUTTONDBLCLK:
 				case WM_LBUTTONDOWN:
 					if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
