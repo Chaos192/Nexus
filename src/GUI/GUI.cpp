@@ -174,11 +174,6 @@ namespace GUI
 						/* only set cursor pos if cursor is visible */
 						io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
 					}
-
-					if (io.WantCaptureMouse)
-					{
-						return 0;
-					}
 					break;
 				}
 				case WM_LBUTTONDBLCLK:
