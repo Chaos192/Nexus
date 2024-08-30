@@ -730,16 +730,18 @@ void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 		bool wasCtrlPressed = GetAsyncKeyState(VK_CONTROL);
 		bool wasShiftPressed = GetAsyncKeyState(VK_SHIFT);
 
+		InputBind ib = this->Get(aGameBind);
+
 		/* unset modifier state */
-		if (wasAltPressed)
+		if (wasAltPressed && !ib.Alt)
 		{
 			this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
 		}
-		if (wasCtrlPressed)
+		if (wasCtrlPressed && !ib.Ctrl)
 		{
 			this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, false, false));
 		}
-		if (wasShiftPressed)
+		if (wasShiftPressed && !ib.Shift)
 		{
 			this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
 		}
@@ -750,15 +752,15 @@ void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 		this->Release(aGameBind);
 
 		/* restore modifier state */
-		if (wasAltPressed)
+		if (GetAsyncKeyState(VK_MENU))
 		{
 			this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
 		}
-		if (wasCtrlPressed)
+		if (GetAsyncKeyState(VK_CONTROL))
 		{
 			this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
 		}
-		if (wasShiftPressed)
+		if (GetAsyncKeyState(VK_SHIFT))
 		{
 			this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
 		}
