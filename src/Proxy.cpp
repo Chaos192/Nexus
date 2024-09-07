@@ -89,58 +89,6 @@ namespace Proxy
 				}
 
 				State::Directx = EDxState::LOADED;
-
-				if (State::Directx < EDxState::HOOKED && !State::IsVanilla)
-				{
-					WNDCLASSEXA wc;
-					memset(&wc, 0, sizeof(wc));
-					wc.cbSize = sizeof(wc);
-					wc.lpfnWndProc = DefWindowProcA;
-					wc.hInstance = GetModuleHandleA(0);
-					wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
-					wc.lpszClassName = "Raidcore_Dx_Window_Class";
-					RegisterClassExA(&wc);
-
-					HWND wnd = CreateWindowExA(0, wc.lpszClassName, 0, WS_OVERLAPPED, 0, 0, 1280, 720, 0, 0, wc.hInstance, 0);
-					if (wnd)
-					{
-						DXGI_SWAP_CHAIN_DESC swap_desc = {};
-						swap_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-						swap_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-						swap_desc.BufferCount = 1;
-						swap_desc.SampleDesc.Count = 1;
-						swap_desc.OutputWindow = wnd;
-						swap_desc.Windowed = TRUE;
-
-						ID3D11Device* device;
-						ID3D11DeviceContext* context;
-						IDXGISwapChain* swap;
-
-						if (SUCCEEDED(Proxy::D3D11::D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swap_desc, &swap, &device, 0, &context)))
-						{
-							LPVOID* vtbl;
-
-							vtbl = *(LPVOID**)swap;
-							//dxgi_release = hook_vtbl_fn(vtbl, 2, dxgi_release_hook);
-							//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
-							//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
-
-							MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Hooks::DXGIPresent, (LPVOID*)&Hooks::DXGI::Present);
-							MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Hooks::DXGIResizeBuffers, (LPVOID*)&Hooks::DXGI::ResizeBuffers);
-							MH_EnableHook(MH_ALL_HOOKS);
-
-							context->Release();
-							device->Release();
-							swap->Release();
-						}
-
-						DestroyWindow(wnd);
-					}
-
-					UnregisterClassA(wc.lpszClassName, wc.hInstance);
-
-					State::Directx = EDxState::HOOKED;
-				}
 			}
 
 			if (!D3D11Handle)
@@ -209,7 +157,7 @@ namespace Proxy
 				return 0;
 			}
 
-			return Proxy::D3D11::CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
+			return Proxy::D3D11::D3D11CreateDeviceAndSwapChain(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, nullptr, nullptr, ppDevice, pFeatureLevel, ppImmediateContext);
 		}
 		HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 		{
@@ -218,7 +166,79 @@ namespace Proxy
 				return 0;
 			}
 
-			return Proxy::D3D11::CreateDeviceAndSwapChain(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
+			HRESULT result = 0;
+
+			if (State::Directx < EDxState::HOOKED && !State::IsVanilla)
+			{
+				WNDCLASSEXA wc;
+				memset(&wc, 0, sizeof(wc));
+				wc.cbSize = sizeof(wc);
+				wc.lpfnWndProc = DefWindowProcA;
+				wc.hInstance = GetModuleHandleA(0);
+				wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+				wc.lpszClassName = "Raidcore_Dx_Window_Class";
+				RegisterClassExA(&wc);
+
+				HWND wnd = CreateWindowExA(0, wc.lpszClassName, 0, WS_OVERLAPPED, 0, 0, 1280, 720, 0, 0, wc.hInstance, 0);
+				if (wnd)
+				{
+					DXGI_SWAP_CHAIN_DESC swap_desc = {};
+
+					if (ppSwapChain)
+					{
+						swap_desc = *pSwapChainDesc;
+					}
+					else
+					{
+						swap_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+						swap_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+						swap_desc.BufferCount = 1;
+						swap_desc.SampleDesc.Count = 1;
+						swap_desc.OutputWindow = wnd;
+						swap_desc.Windowed = TRUE;
+					}
+
+					ID3D11Device* device;
+					ID3D11DeviceContext* context;
+					IDXGISwapChain* swap;
+
+					result = Proxy::D3D11::CreateDeviceAndSwapChain(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, &swap_desc, &swap, &device, pFeatureLevel, &context);
+
+					if (SUCCEEDED(result))
+					{
+						LPVOID* vtbl;
+
+						vtbl = *(LPVOID**)swap;
+						//dxgi_release = hook_vtbl_fn(vtbl, 2, dxgi_release_hook);
+						//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
+						//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
+
+						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Hooks::DXGIPresent, (LPVOID*)&Hooks::DXGI::Present);
+						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Hooks::DXGIResizeBuffers, (LPVOID*)&Hooks::DXGI::ResizeBuffers);
+						MH_EnableHook(MH_ALL_HOOKS);
+
+						//context->Release();
+						//device->Release();
+						//swap->Release();
+
+						*ppDevice = device;
+						*ppImmediateContext = context;
+
+						if (ppSwapChain)
+						{
+							*ppSwapChain = swap;
+						}
+					}
+
+					DestroyWindow(wnd);
+				}
+
+				UnregisterClassA(wc.lpszClassName, wc.hInstance);
+
+				State::Directx = EDxState::HOOKED;
+			}
+
+			return result;
 		}
 		HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device** ppDevice)
 		{
