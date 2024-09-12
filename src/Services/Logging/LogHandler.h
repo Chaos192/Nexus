@@ -114,6 +114,9 @@ private:
 	std::mutex					Mutex;
 	std::vector<ILogger*>		Registry;
 	std::vector<LogEntry>		LogEntries;
+
+	std::string					LastMessage;
+	ELogLevel					LastMessageLevel;
 };
 
 #endif

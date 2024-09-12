@@ -170,6 +170,19 @@ namespace GUI
 							ImVec2 pos = posInitial;
 							std::vector<MessagePart> msgParts; // = String::Split(entry.Message, " ", true);
 
+							if (entry.RepeatCount > 1)
+							{
+								MessagePart msgPart{};
+								msgPart.Type = EMessagePartType::Text;
+								msgPart.Text = "(" + std::to_string(entry.RepeatCount) + ")";
+								msgParts.push_back(msgPart);
+
+								MessagePart msgSpace{};
+								msgSpace.Type = EMessagePartType::Text;
+								msgSpace.Text = " ";
+								msgParts.push_back(msgSpace);
+							}
+
 							size_t idxLastWordStart = 0;
 							for (size_t i = 0; i < entry.Message.size(); i++)
 							{
@@ -322,6 +335,12 @@ namespace GUI
 	void CLogWindow::LogMessage(LogEntry aLogEntry)
 	{
 		const std::lock_guard<std::mutex> lock(Mutex);
+
+		if (aLogEntry.RepeatCount > 1)
+		{
+			this->LogEntries[this->LogEntries.size() - 1].RepeatCount++;
+			return;
+		}
 
 		if (std::find(this->Channels.begin(), this->Channels.end(), aLogEntry.Channel) == this->Channels.end())
 		{
