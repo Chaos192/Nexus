@@ -242,7 +242,7 @@ namespace Proxy
 
 				State::Directx = EDxState::HOOKED;
 			}
-			else if (State::IsVanilla)
+			else
 			{
 				result = Proxy::D3D11::CreateDeviceAndSwapChain(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
 			}
