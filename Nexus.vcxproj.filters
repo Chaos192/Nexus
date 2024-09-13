@@ -1151,6 +1151,9 @@
     <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h">
       <Filter>Inputs\InputBinds\Enums</Filter>
     </ClInclude>
+    <ClInclude Include="src\Remote.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc">

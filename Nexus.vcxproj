@@ -91,6 +91,7 @@
     <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h" />
     <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
     <ClInclude Include="src\Loader\AddonVersion.h" />
+    <ClInclude Include="src\Remote.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
     <ClInclude Include="src\Services\API\ActiveToken.h" />
@@ -482,7 +483,8 @@
     </Link>
     <PreBuildEvent>
       <Command>CALL $(SolutionDir)Scripts\branch.bat
-CALL $(SolutionDir)Scripts\version.bat</Command>
+CALL $(SolutionDir)Scripts\version.bat
+CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -518,7 +520,8 @@ CALL $(SolutionDir)Scripts\version.bat</Command>
     </Link>
     <PreBuildEvent>
       <Command>CALL $(SolutionDir)Scripts\branch.bat
-CALL $(SolutionDir)Scripts\version.bat</Command>
+CALL $(SolutionDir)Scripts\version.bat
+CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
